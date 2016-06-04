@@ -96,7 +96,7 @@ function forward_port_if_necessary {
       [[ ! -f "${SSH_KEY}" ]] && ssh-keygen -t rsa -f "${SSH_KEY}" -N '' >/dev/null
 
       docker run --name kid_ssh -d --net host -v "${SSH_KEY}.pub":/etc/ssh/keys/kid_rsa.key.pub:ro danisla/ssh-server:latest > /dev/null
-      nohup ssh -f -N -i "${SSH_KEY}" -L 8080:localhost:8080 nobody@docker-mac.local >/dev/null 2>&1 &
+      ssh -f -N -i "${SSH_KEY}" -oStrictHostKeyChecking=no -L 8080:localhost:8080 nobody@docker-mac.local & 
     fi
 }
 
@@ -445,6 +445,8 @@ if [ "$1" == "up" ]; then
 elif [ "$1" == "down" ]; then
     # TODO: Ensure current Kubernetes context is set to local Docker (or Docker Machine VM) before downing
     stop_kubernetes $KUBERNETES_API_PORT
+    docker kill avahi-docker-mac
+    docker rm avahi-docker-mac
 elif [ "$1" == "restart" ]; then
     # TODO: Check if not currently running before downing. Show a message if not running.
     kid down && kid up
