@@ -96,7 +96,7 @@ function forward_port_if_necessary {
       [[ ! -f "${SSH_KEY}" ]] && ssh-keygen -t rsa -f "${SSH_KEY}" -N '' >/dev/null
 
       docker run --name kid_ssh -d --net host -v "${SSH_KEY}.pub":/etc/ssh/keys/kid_rsa.key.pub:ro danisla/ssh-server:latest > /dev/null
-      ssh -f -N -i "${SSH_KEY}" -oStrictHostKeyChecking=no -L 8080:localhost:8080 nobody@docker-mac.local & 
+      nohup ssh -f -N -i "${SSH_KEY}" -L 8080:localhost:8080 nobody@docker-mac.local >/dev/null 2>&1 &
     fi
 }
 
